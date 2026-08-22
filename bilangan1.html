@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memahami Bilangan Bulat - Kelas 7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0d9488;
+    --teal-dark:#0f766e;
+    --orange:#f97316;
+    --orange-dark:#ea580c;
+    --purple:#7c3aed;
+    --purple-light:#ede9fe;
+    --bg:#f7fbfa;
+    --card:#ffffff;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --neg:#ef4444;
+    --pos:#0ea5e9;
+    --shadow: 0 10px 30px rgba(15,118,110,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Nunito', sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+    padding-bottom:60px;
+  }
+  h1,h2,h3,h4{font-family:'Fredoka', sans-serif; font-weight:600;}
+
+  /* HERO */
+  .hero{
+    background:linear-gradient(135deg, var(--teal) 0%, var(--purple) 100%);
+    color:#fff;
+    padding:70px 24px 90px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before, .hero::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,0.08);
+  }
+  .hero::before{width:280px;height:280px; top:-100px; left:-80px;}
+  .hero::after{width:200px;height:200px; bottom:-80px; right:-40px;}
+  .hero h1{font-size:2.4rem; margin-bottom:10px; position:relative;}
+  .hero p{font-size:1.1rem; opacity:0.95; max-width:600px; margin:0 auto; position:relative;}
+  .hero .badge{
+    display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px;
+    border-radius:999px; font-size:0.85rem; margin-bottom:16px; letter-spacing:0.5px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap{
+    position:sticky; top:0; z-index:100; background:#fff;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  }
+  .progress-bar{
+    height:6px; background:linear-gradient(90deg, var(--orange), var(--teal));
+    width:0%; transition:width 0.15s ease;
+  }
+
+  /* NAV */
+  nav{
+    display:flex; overflow-x:auto; gap:6px; padding:12px 16px;
+    background:#fff; scrollbar-width:thin;
+  }
+  nav::-webkit-scrollbar{height:4px;}
+  nav a{
+    white-space:nowrap; text-decoration:none; color:var(--muted);
+    font-weight:700; font-size:0.85rem; padding:8px 14px;
+    border-radius:999px; transition:all 0.2s; border:2px solid transparent;
+  }
+  nav a:hover{background:var(--purple-light); color:var(--purple);}
+  nav a.active{background:var(--teal); color:#fff;}
+
+  .wrap{max-width:900px; margin:-40px auto 0; padding:0 16px; position:relative; z-index:2;}
+
+  section{
+    background:var(--card); border-radius:20px; box-shadow:var(--shadow);
+    padding:32px; margin-bottom:24px; scroll-margin-top:80px;
+  }
+  section h2{
+    font-size:1.5rem; color:var(--teal-dark); margin-bottom:6px;
+    display:flex; align-items:center; gap:10px;
+  }
+  section h2 .num{
+    background:var(--teal); color:#fff; width:34px; height:34px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0;
+  }
+  section .subtitle{color:var(--muted); margin-bottom:20px; font-size:0.95rem;}
+  section h3{color:var(--purple); font-size:1.1rem; margin:20px 0 10px;}
+
+  .info-box{
+    background:var(--purple-light); border-left:4px solid var(--purple);
+    border-radius:10px; padding:14px 18px; margin:16px 0; font-size:0.95rem;
+  }
+  .example-box{
+    background:#fff7ed; border-left:4px solid var(--orange);
+    border-radius:10px; padding:14px 18px; margin:16px 0; font-size:0.95rem;
+  }
+
+  /* ACCORDION */
+  .accordion-item{border:2px solid #e5e7eb; border-radius:12px; margin-bottom:10px; overflow:hidden;}
+  .accordion-header{
+    background:#f0fdfa; padding:14px 18px; cursor:pointer; font-weight:700;
+    display:flex; justify-content:space-between; align-items:center; color:var(--teal-dark);
+  }
+  .accordion-header:hover{background:#ccfbf1;}
+  .accordion-header .arrow{transition:transform 0.25s;}
+  .accordion-item.open .arrow{transform:rotate(180deg);}
+  .accordion-body{
+    max-height:0; overflow:hidden; transition:max-height 0.3s ease; padding:0 18px;
+  }
+  .accordion-item.open .accordion-body{max-height:400px; padding:14px 18px;}
+
+  /* NUMBER LINE */
+  .numline-wrap{
+    background:#f8fafc; border-radius:14px; padding:20px 10px; margin:16px 0;
+    text-align:center;
+  }
+  canvas{max-width:100%; touch-action:none;}
+  .numline-controls{
+    display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px;
+  }
+  .btn{
+    background:var(--teal); color:#fff; border:none; padding:10px 18px;
+    border-radius:10px; font-weight:700; cursor:pointer; font-size:0.9rem;
+    font-family:'Nunito',sans-serif; transition:transform 0.15s, background 0.2s;
+  }
+  .btn:hover{background:var(--teal-dark); transform:translateY(-2px);}
+  .btn.orange{background:var(--orange);}
+  .btn.orange:hover{background:var(--orange-dark);}
+  .btn.purple{background:var(--purple);}
+  .btn.purple:hover{background:#6d28d9;}
+  .btn:disabled{background:#cbd5e1; cursor:not-allowed; transform:none;}
+
+  .readout{
+    font-family:'Fredoka',sans-serif; font-size:1.3rem; margin-top:10px; color:var(--teal-dark);
+  }
+
+  /* COMPARE TOOL */
+  .compare-tool{
+    display:flex; align-items:center; justify-content:center; gap:16px;
+    flex-wrap:wrap; margin:20px 0;
+  }
+  .compare-tool input[type=number]{
+    width:90px; padding:12px; font-size:1.3rem; text-align:center; border-radius:10px;
+    border:2px solid #cbd5e1; font-family:'Fredoka',sans-serif;
+  }
+  .compare-symbol{
+    font-family:'Fredoka',sans-serif; font-size:2rem; color:var(--orange);
+    width:60px; text-align:center;
+  }
+
+  /* TABS */
+  .tabs{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
+  .tab-btn{
+    background:#f1f5f9; border:2px solid transparent; padding:10px 16px; border-radius:10px;
+    cursor:pointer; font-weight:700; color:var(--muted); font-family:'Nunito',sans-serif;
+  }
+  .tab-btn.active{background:var(--orange); color:#fff;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block; animation:fadeIn 0.3s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  table.rules{width:100%; border-collapse:collapse; margin:14px 0;}
+  table.rules th, table.rules td{
+    border:2px solid #e5e7eb; padding:10px; text-align:center; font-size:0.9rem;
+  }
+  table.rules th{background:var(--teal); color:#fff;}
+  table.rules tr:nth-child(even){background:#f8fafc;}
+
+  /* JUMP GAME */
+  .jump-input-row{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; align-items:center; margin:14px 0;}
+  select, input[type=text]{
+    padding:10px; border-radius:8px; border:2px solid #cbd5e1; font-size:1rem;
+    font-family:'Nunito',sans-serif;
+  }
+
+  /* QUIZ */
+  .quiz-card{border:2px solid #e5e7eb; border-radius:14px; padding:18px; margin-bottom:16px;}
+  .quiz-question{font-weight:700; margin-bottom:12px; color:var(--text);}
+  .quiz-options{display:grid; gap:8px;}
+  .quiz-option{
+    background:#f8fafc; border:2px solid #e5e7eb; border-radius:10px; padding:10px 14px;
+    cursor:pointer; text-align:left; font-family:'Nunito',sans-serif; font-size:0.95rem;
+    transition:all 0.15s;
+  }
+  .quiz-option:hover{border-color:var(--teal);}
+  .quiz-option.correct{background:#dcfce7; border-color:#22c55e; font-weight:700;}
+  .quiz-option.wrong{background:#fee2e2; border-color:#ef4444;}
+  .quiz-feedback{margin-top:10px; font-weight:700; font-size:0.9rem; display:none;}
+
+  #score-panel{
+    background:linear-gradient(135deg, var(--orange), var(--purple));
+    color:#fff; text-align:center; border-radius:16px; padding:24px; margin-top:10px;
+  }
+  #score-panel h3{color:#fff; font-size:1.6rem;}
+
+  footer{text-align:center; color:var(--muted); font-size:0.85rem; margin-top:30px; padding:0 16px;}
+
+  @media(max-width:600px){
+    .hero h1{font-size:1.8rem;}
+    section{padding:22px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="badge">📘 Matematika · SMP Kelas 7</span>
+  <h1>Memahami Bilangan Bulat</h1>
+  <p>Belajar mengenal, membandingkan, dan menghitung bilangan bulat lewat garis bilangan interaktif, permainan lompatan, dan kuis seru!</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar" id="progressBar"></div>
+  <nav id="navbar">
+    <a href="#pengenalan" class="nav-link">🔎 Pengenalan</a>
+    <a href="#garis-bilangan" class="nav-link">📏 Garis Bilangan</a>
+    <a href="#bandingkan" class="nav-link">⚖️ Bandingkan</a>
+    <a href="#operasi" class="nav-link">➕➖ Operasi Hitung</a>
+    <a href="#lawan" class="nav-link">🔁 Lawan & Mutlak</a>
+    <a href="#kuis" class="nav-link">📝 Kuis</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+  <!-- 1. PENGENALAN -->
+  <section id="pengenalan">
+    <h2><span class="num">1</span> Apa itu Bilangan Bulat?</h2>
+    <p class="subtitle">Mengenal kelompok bilangan positif, negatif, dan nol</p>
+
+    <p><strong>Bilangan bulat</strong> adalah kumpulan bilangan yang terdiri dari bilangan <strong>negatif</strong>, <strong>nol</strong>, dan bilangan <strong>positif</strong>, tanpa pecahan atau desimal.</p>
+
+    <div class="info-box">
+      <strong>Himpunan bilangan bulat:</strong><br>
+      { ..., -3, -2, -1, 0, 1, 2, 3, ... }
+    </div>
+
+    <h3>Contoh dalam kehidupan sehari-hari</h3>
+    <div class="accordion" id="accordion1">
+      <div class="accordion-item">
+        <div class="accordion-header">🌡️ Suhu <span class="arrow">▼</span></div>
+        <div class="accordion-body">Suhu di puncak gunung bisa mencapai -5°C (5 derajat di bawah nol), sedangkan suhu di kota bisa 30°C.</div>
+      </div>
+      <div class="accordion-item">
+        <div class="accordion-header">🏔️ Ketinggian & Kedalaman <span class="arrow">▼</span></div>
+        <div class="accordion-body">Puncak gunung memiliki ketinggian +3.000 m di atas permukaan laut, sedangkan dasar laut bisa mencapai -1.000 m (di bawah permukaan laut).</div>
+      </div>
+      <div class="accordion-item">
+        <div class="accordion-header">💰 Uang / Utang <span class="arrow">▼</span></div>
+        <div class="accordion-body">Jika kamu punya utang Rp10.000, itu bisa ditulis sebagai -10.000. Jika kamu punya tabungan Rp10.000, ditulis +10.000.</div>
+      </div>
+      <div class="accordion-item">
+        <div class="accordion-header">🛗 Lantai Gedung <span class="arrow">▼</span></div>
+        <div class="accordion-body">Lantai dasar = 0, lantai basement 1 = -1, lantai 2 di atas dasar = +2.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. GARIS BILANGAN -->
+  <section id="garis-bilangan">
+    <h2><span class="num">2</span> Garis Bilangan Interaktif</h2>
+    <p class="subtitle">Klik atau geser titik untuk menjelajahi posisi bilangan</p>
+
+    <div class="numline-wrap">
+      <canvas id="numlineCanvas" width="820" height="150"></canvas>
+      <div class="readout">Posisi saat ini: <span id="numlineValue">0</span></div>
+      <div class="numline-controls">
+        <button class="btn" onclick="moveMarker(-1)">◀ Mundur 1</button>
+        <button class="btn orange" onclick="moveMarker(1)">Maju 1 ▶</button>
+        <button class="btn purple" onclick="resetMarker()">Reset ke 0</button>
+      </div>
+    </div>
+    <div class="info-box">
+      💡 Semakin ke <strong>kanan</strong>, nilai bilangan semakin <strong>besar</strong>. Semakin ke <strong>kiri</strong>, nilai bilangan semakin <strong>kecil</strong>. Kamu juga bisa klik langsung di garis bilangan atau seret titik birunya!
+    </div>
+  </section>
+
+  <!-- 3. BANDINGKAN -->
+  <section id="bandingkan">
+    <h2><span class="num">3</span> Membandingkan & Mengurutkan</h2>
+    <p class="subtitle">Gunakan simbol &lt; (kurang dari), &gt; (lebih dari), atau = (sama dengan)</p>
+
+    <div class="compare-tool">
+      <input type="number" id="numA" value="-3">
+      <div class="compare-symbol" id="compareSymbol">?</div>
+      <input type="number" id="numB" value="5">
+    </div>
+    <div style="text-align:center;">
+      <button class="btn" onclick="compareNumbers()">Bandingkan!</button>
+    </div>
+    <p id="compareExplain" style="text-align:center; margin-top:10px; font-weight:700; color:var(--teal-dark);"></p>
+
+    <div class="example-box">
+      <strong>Ingat:</strong> Di garis bilangan, bilangan yang letaknya lebih ke kanan selalu lebih besar — walau kelihatannya "negatifnya besar". Contoh: -2 &gt; -8, karena -2 lebih ke kanan daripada -8.
+    </div>
+  </section>
+
+  <!-- 4. OPERASI -->
+  <section id="operasi">
+    <h2><span class="num">4</span> Operasi Hitung Bilangan Bulat</h2>
+    <p class="subtitle">Penjumlahan, pengurangan, perkalian, dan pembagian</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('tambah')">➕➖ Tambah & Kurang</button>
+      <button class="tab-btn" onclick="showTab('kali')">✖️➗ Kali & Bagi</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-tambah">
+      <h3>Lompatan di Garis Bilangan</h3>
+      <p>Bilangan positif = lompat ke <strong>kanan</strong>. Bilangan negatif = lompat ke <strong>kiri</strong>.</p>
+
+      <div class="jump-input-row">
+        <span>Mulai dari</span>
+        <input type="number" id="jumpStart" value="0" style="width:70px;">
+        <select id="jumpOp">
+          <option value="+">+ (tambah)</option>
+          <option value="-">− (kurang)</option>
+        </select>
+        <input type="number" id="jumpAmount" value="4" style="width:70px;">
+        <button class="btn" onclick="doJump()">Lompat!</button>
+      </div>
+
+      <div class="numline-wrap">
+        <canvas id="jumpCanvas" width="820" height="150"></canvas>
+        <div class="readout" id="jumpResult">Hasil: -</div>
+      </div>
+
+      <table class="rules">
+        <tr><th>Aturan</th><th>Contoh</th></tr>
+        <tr><td>positif + positif = positif</td><td>3 + 5 = 8</td></tr>
+        <tr><td>negatif + negatif = negatif</td><td>-3 + (-5) = -8</td></tr>
+        <tr><td>a − b = a + (−b)</td><td>4 − 6 = 4 + (−6) = −2</td></tr>
+        <tr><td>a − (−b) = a + b</td><td>4 − (−6) = 4 + 6 = 10</td></tr>
+      </table>
+    </div>
+
+    <div class="tab-panel" id="tab-kali">
+      <h3>Aturan Tanda Perkalian & Pembagian</h3>
+      <table class="rules">
+        <tr><th>Tanda 1</th><th>Tanda 2</th><th>Hasil</th><th>Contoh</th></tr>
+        <tr><td>+</td><td>+</td><td>+</td><td>4 × 3 = 12</td></tr>
+        <tr><td>−</td><td>−</td><td>+</td><td>-4 × -3 = 12</td></tr>
+        <tr><td>+</td><td>−</td><td>−</td><td>4 × -3 = -12</td></tr>
+        <tr><td>−</td><td>+</td><td>−</td><td>-4 × 3 = -12</td></tr>
+      </table>
+      <div class="info-box">
+        Aturan yang sama berlaku untuk <strong>pembagian</strong>: tanda sama menghasilkan positif, tanda berbeda menghasilkan negatif. Contoh: -20 ÷ -4 = 5, tapi -20 ÷ 4 = -5.
+      </div>
+
+      <h3>Coba Sendiri</h3>
+      <div class="jump-input-row">
+        <input type="number" id="calcA" value="-6" style="width:70px;">
+        <select id="calcOp">
+          <option value="×">×</option>
+          <option value="÷">÷</option>
+        </select>
+        <input type="number" id="calcB" value="3" style="width:70px;">
+        <button class="btn orange" onclick="doCalc()">Hitung</button>
+      </div>
+      <p class="readout" id="calcResult">Hasil: -</p>
+    </div>
+  </section>
+
+  <!-- 5. LAWAN & MUTLAK -->
+  <section id="lawan">
+    <h2><span class="num">5</span> Lawan Bilangan & Nilai Mutlak</h2>
+    <p class="subtitle">Dua konsep penting yang sering dipakai</p>
+
+    <h3>Lawan Bilangan</h3>
+    <p>Lawan dari suatu bilangan adalah bilangan itu dengan tanda yang dibalik. Lawan dari 7 adalah -7, dan lawan dari -12 adalah 12. Jika dijumlahkan, bilangan dan lawannya selalu menghasilkan <strong>0</strong>.</p>
+
+    <h3>Nilai Mutlak</h3>
+    <p>Nilai mutlak adalah jarak suatu bilangan ke titik 0 pada garis bilangan, dan selalu bernilai <strong>positif atau nol</strong>. Nilai mutlak dituliskan dengan tanda garis tegak: |x|.</p>
+
+    <div class="example-box">
+      |5| = 5 &nbsp;&nbsp;&nbsp; |−5| = 5 &nbsp;&nbsp;&nbsp; |0| = 0
+    </div>
+
+    <div class="jump-input-row">
+      <span>Hitung nilai mutlak dari</span>
+      <input type="number" id="absInput" value="-9" style="width:80px;">
+      <button class="btn purple" onclick="doAbs()">Hitung</button>
+    </div>
+    <p class="readout" id="absResult">Hasil: -</p>
+  </section>
+
+  <!-- 6. KUIS -->
+  <section id="kuis">
+    <h2><span class="num">6</span> Kuis: Uji Pemahamanmu!</h2>
+    <p class="subtitle">Jawab 5 soal berikut, lalu lihat skor akhirmu</p>
+    <div id="quizContainer"></div>
+    <div style="text-align:center;">
+      <button class="btn orange" id="submitQuizBtn" onclick="submitQuiz()">Kumpulkan Jawaban</button>
+    </div>
+    <div id="score-panel" style="display:none;"></div>
+  </section>
+
+</div>
+
+<footer>
+  Materi ajar oleh Martin Bernard, M.Pd. — IKIP Siliwangi<br>
+  Memahami Bilangan Bulat · Matematika SMP Kelas 7
+</footer>
+
+<script>
+/* ===== SCROLL SPY + PROGRESS BAR ===== */
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progressBar').style.width = (scrollTop/docHeight*100) + '%';
+
+  let current = '';
+  sections.forEach(sec => {
+    if (scrollTop >= sec.offsetTop - 100) current = sec.id;
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+});
+
+/* ===== ACCORDION ===== */
+document.querySelectorAll('.accordion-header').forEach(h => {
+  h.addEventListener('click', () => {
+    h.parentElement.classList.toggle('open');
+  });
+});
+
+/* ===== TABS ===== */
+function showTab(name){
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ===== NUMBER LINE (interactive marker) ===== */
+const canvas = document.getElementById('numlineCanvas');
+const ctx = canvas.getContext('2d');
+const RANGE = 10; // -10 to 10
+let markerValue = 0;
+
+function xForValue(v){
+  const margin = 40;
+  const usable = canvas.width - margin*2;
+  return margin + ((v + RANGE) / (RANGE*2)) * usable;
+}
+
+function drawNumline(targetCanvas, targetCtx, value, highlightJump){
+  const c = targetCanvas, cx = targetCtx;
+  cx.clearRect(0,0,c.width,c.height);
+  const y = c.height/2 + 10;
+  const margin = 40;
+
+  // line
+  cx.strokeStyle = '#94a3b8';
+  cx.lineWidth = 3;
+  cx.beginPath();
+  cx.moveTo(margin, y);
+  cx.lineTo(c.width - margin, y);
+  cx.stroke();
+
+  // ticks
+  for(let i=-RANGE; i<=RANGE; i++){
+    const x = margin + ((i + RANGE) / (RANGE*2)) * (c.width - margin*2);
+    cx.strokeStyle = i===0 ? '#0d9488' : '#cbd5e1';
+    cx.lineWidth = i===0 ? 3 : 1.5;
+    cx.beginPath();
+    cx.moveTo(x, y-10);
+    cx.lineTo(x, y+10);
+    cx.stroke();
+    if(i % 2 === 0){
+      cx.fillStyle = i < 0 ? '#ef4444' : (i>0 ? '#0ea5e9' : '#0f766e');
+      cx.font = '600 13px Nunito, sans-serif';
+      cx.textAlign = 'center';
+      cx.fillText(i, x, y+28);
+    }
+  }
+
+  // marker
+  const mx = margin + ((value + RANGE) / (RANGE*2)) * (c.width - margin*2);
+  cx.beginPath();
+  cx.arc(mx, y, 12, 0, Math.PI*2);
+  cx.fillStyle = value < 0 ? '#ef4444' : (value > 0 ? '#0ea5e9' : '#7c3aed');
+  cx.fill();
+  cx.strokeStyle = '#fff';
+  cx.lineWidth = 3;
+  cx.stroke();
+}
+
+drawNumline(canvas, ctx, markerValue);
+
+function moveMarker(delta){
+  markerValue = Math.max(-RANGE, Math.min(RANGE, markerValue + delta));
+  updateNumline();
+}
+function resetMarker(){
+  markerValue = 0;
+  updateNumline();
+}
+function updateNumline(){
+  drawNumline(canvas, ctx, markerValue);
+  document.getElementById('numlineValue').textContent = markerValue;
+}
+
+function valueForX(clientX, c){
+  const rect = c.getBoundingClientRect();
+  const scaleX = c.width / rect.width;
+  const x = (clientX - rect.left) * scaleX;
+  const margin = 40;
+  const usable = c.width - margin*2;
+  let v = Math.round(((x - margin) / usable) * (RANGE*2) - RANGE);
+  return Math.max(-RANGE, Math.min(RANGE, v));
+}
+
+let dragging = false;
+canvas.addEventListener('mousedown', e => { dragging = true; markerValue = valueForX(e.clientX, canvas); updateNumline(); });
+window.addEventListener('mousemove', e => { if(dragging){ markerValue = valueForX(e.clientX, canvas); updateNumline(); }});
+window.addEventListener('mouseup', () => dragging = false);
+canvas.addEventListener('touchstart', e => { dragging = true; markerValue = valueForX(e.touches[0].clientX, canvas); updateNumline(); });
+canvas.addEventListener('touchmove', e => { if(dragging){ markerValue = valueForX(e.touches[0].clientX, canvas); updateNumline(); e.preventDefault(); }}, {passive:false});
+window.addEventListener('touchend', () => dragging = false);
+
+/* ===== COMPARE TOOL ===== */
+function compareNumbers(){
+  const a = parseInt(document.getElementById('numA').value);
+  const b = parseInt(document.getElementById('numB').value);
+  const sym = document.getElementById('compareSymbol');
+  const explain = document.getElementById('compareExplain');
+  if(isNaN(a) || isNaN(b)) return;
+  let symbol = a === b ? '=' : (a > b ? '>' : '<');
+  sym.textContent = symbol;
+  explain.textContent = `${a} ${symbol} ${b} — karena ${a} terletak ${symbol==='>' ? 'lebih ke kanan' : (symbol==='<' ? 'lebih ke kiri' : 'di posisi yang sama')} dibanding ${b} pada garis bilangan.`;
+}
+
+/* ===== JUMP GAME ===== */
+const jumpCanvas = document.getElementById('jumpCanvas');
+const jumpCtx = jumpCanvas.getContext('2d');
+drawNumline(jumpCanvas, jumpCtx, 0);
+
+function doJump(){
+  const start = parseInt(document.getElementById('jumpStart').value) || 0;
+  const op = document.getElementById('jumpOp').value;
+  const amount = parseInt(document.getElementById('jumpAmount').value) || 0;
+  const result = op === '+' ? start + amount : start - amount;
+  const clamped = Math.max(-RANGE, Math.min(RANGE, result));
+  drawNumline(jumpCanvas, jumpCtx, clamped);
+  document.getElementById('jumpResult').textContent =
+    `Hasil: ${start} ${op} ${amount} = ${result}`;
+}
+
+/* ===== CALC (kali/bagi) ===== */
+function doCalc(){
+  const a = parseFloat(document.getElementById('calcA').value);
+  const op = document.getElementById('calcOp').value;
+  const b = parseFloat(document.getElementById('calcB').value);
+  let result;
+  if(op === '×') result = a * b;
+  else result = b !== 0 ? (a / b) : 'tak terdefinisi';
+  document.getElementById('calcResult').textContent = `Hasil: ${a} ${op} ${b} = ${result}`;
+}
+
+/* ===== ABSOLUTE VALUE ===== */
+function doAbs(){
+  const v = parseInt(document.getElementById('absInput').value);
+  document.getElementById('absResult').textContent = `Hasil: |${v}| = ${Math.abs(v)}`;
+}
+
+/* ===== QUIZ ===== */
+const quizData = [
+  {
+    q: "Manakah yang termasuk bilangan bulat negatif?",
+    options: ["3", "-7", "0", "2.5"],
+    correct: 1
+  },
+  {
+    q: "Manakah pernyataan yang benar?",
+    options: ["-2 < -8", "-8 > -2", "-2 > -8", "-2 = -8"],
+    correct: 2
+  },
+  {
+    q: "Berapakah hasil dari -4 + (-6)?",
+    options: ["10", "-10", "2", "-2"],
+    correct: 1
+  },
+  {
+    q: "Berapakah hasil dari -5 × -3?",
+    options: ["-15", "15", "-8", "8"],
+    correct: 1
+  },
+  {
+    q: "Berapakah nilai dari |−9|?",
+    options: ["-9", "0", "9", "18"],
+    correct: 2
+  }
+];
+
+const quizContainer = document.getElementById('quizContainer');
+let userAnswers = new Array(quizData.length).fill(null);
+
+quizData.forEach((item, qi) => {
+  const card = document.createElement('div');
+  card.className = 'quiz-card';
+  card.innerHTML = `
+    <div class="quiz-question">${qi+1}. ${item.q}</div>
+    <div class="quiz-options" id="options-${qi}">
+      ${item.options.map((opt, oi) => `<div class="quiz-option" data-qi="${qi}" data-oi="${oi}">${opt}</div>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="feedback-${qi}"></div>
+  `;
+  quizContainer.appendChild(card);
+});
+
+quizContainer.addEventListener('click', e => {
+  const opt = e.target.closest('.quiz-option');
+  if(!opt) return;
+  const qi = parseInt(opt.dataset.qi);
+  const oi = parseInt(opt.dataset.oi);
+  userAnswers[qi] = oi;
+  document.querySelectorAll(`#options-${qi} .quiz-option`).forEach(o => o.style.outline = 'none');
+  document.querySelectorAll(`#options-${qi} .quiz-option`).forEach(o => o.style.borderColor = '#e5e7eb');
+  opt.style.borderColor = '#0d9488';
+  opt.style.background = '#f0fdfa';
+});
+
+function submitQuiz(){
+  let score = 0;
+  quizData.forEach((item, qi) => {
+    const options = document.querySelectorAll(`#options-${qi} .quiz-option`);
+    options.forEach((o, oi) => {
+      o.style.pointerEvents = 'none';
+      if(oi === item.correct) o.classList.add('correct');
+      else if(oi === userAnswers[qi]) o.classList.add('wrong');
+    });
+    const fb = document.getElementById(`feedback-${qi}`);
+    fb.style.display = 'block';
+    if(userAnswers[qi] === item.correct){
+      score++;
+      fb.textContent = '✅ Benar!';
+      fb.style.color = '#16a34a';
+    } else {
+      fb.textContent = `❌ Kurang tepat. Jawaban benar: ${item.options[item.correct]}`;
+      fb.style.color = '#dc2626';
+    }
+  });
+
+  const panel = document.getElementById('score-panel');
+  panel.style.display = 'block';
+  let msg = score === quizData.length ? "Sempurna! Kamu jagoan bilangan bulat! 🎉" :
+            score >= 3 ? "Bagus sekali, terus berlatih! 💪" :
+            "Yuk pelajari lagi materinya, kamu pasti bisa! 📘";
+  panel.innerHTML = `<h3>Skor kamu: ${score} / ${quizData.length}</h3><p>${msg}</p>`;
+  document.getElementById('submitQuizBtn').disabled = true;
+}
+</script>
+</body>
+</html>
