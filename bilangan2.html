@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arena Operasi Bilangan Bulat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#120f2e;
+    --panel:#1c1750;
+    --panel2:#251d63;
+    --cyan:#4deeea;
+    --pink:#f92aad;
+    --yellow:#ffe066;
+    --green:#74ee15;
+    --red:#ff5470;
+    --text:#eef2ff;
+    --muted:#9d97c9;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, rgba(249,42,173,0.18), transparent 45%),
+      radial-gradient(circle at 85% 20%, rgba(77,238,234,0.15), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Quicksand', sans-serif;
+    padding-bottom:60px;
+  }
+  h1,h2,h3,h4{font-family:'Baloo 2', sans-serif;}
+
+  .hero{
+    text-align:center; padding:64px 20px 90px; position:relative; overflow:hidden;
+  }
+  .hero h1{
+    font-size:2.3rem; font-weight:800;
+    background:linear-gradient(90deg,var(--cyan),var(--pink),var(--yellow));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    margin-bottom:12px;
+  }
+  .hero p{color:var(--muted); max-width:560px; margin:0 auto; font-size:1.05rem;}
+  .hero .glow{
+    position:absolute; width:300px; height:300px; border-radius:50%;
+    filter:blur(80px); opacity:0.35; z-index:0;
+  }
+  .glow.g1{background:var(--pink); top:-100px; left:-80px;}
+  .glow.g2{background:var(--cyan); top:-60px; right:-60px;}
+
+  .progress-wrap{ position:sticky; top:0; z-index:100; background:#0e0b26; }
+  .progress-bar{ height:5px; background:linear-gradient(90deg,var(--pink),var(--yellow),var(--cyan)); width:0%; transition:width 0.15s; }
+  nav{ display:flex; overflow-x:auto; gap:6px; padding:12px 16px; }
+  nav a{
+    white-space:nowrap; text-decoration:none; color:var(--muted); font-weight:700; font-size:0.85rem;
+    padding:8px 14px; border-radius:999px; border:2px solid #2c2570; transition:all 0.2s;
+  }
+  nav a.active, nav a:hover{ background:var(--pink); color:#fff; border-color:var(--pink); }
+
+  .wrap{ max-width:920px; margin:-50px auto 0; padding:0 16px; position:relative; z-index:2; }
+
+  section{
+    background:var(--panel); border:1px solid #2c2570; border-radius:22px;
+    padding:32px; margin-bottom:26px; scroll-margin-top:80px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.35);
+  }
+  section h2{
+    font-size:1.5rem; display:flex; align-items:center; gap:12px; margin-bottom:6px;
+  }
+  section h2 .icon{
+    width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem; flex-shrink:0;
+  }
+  .icon.add{ background:linear-gradient(135deg,var(--green),#3ab60a); }
+  .icon.sub{ background:linear-gradient(135deg,var(--cyan),#2199c4); }
+  .icon.mul{ background:linear-gradient(135deg,var(--pink),#c21e86); }
+  .icon.div{ background:linear-gradient(135deg,var(--yellow),#d19f00); }
+  .icon.game{ background:linear-gradient(135deg,var(--red),#a3123a); }
+  section .subtitle{ color:var(--muted); margin-bottom:20px; font-size:0.95rem;}
+
+  .rule-box{
+    background:var(--panel2); border-radius:14px; padding:14px 18px; margin:16px 0;
+    border-left:4px solid var(--cyan); font-size:0.92rem;
+  }
+
+  .input-row{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; margin:16px 0;
+  }
+  input[type=number]{
+    width:80px; padding:10px; border-radius:10px; border:2px solid #3a3382;
+    background:#0e0b26; color:var(--text); font-family:'Baloo 2',sans-serif; font-size:1.1rem;
+    text-align:center;
+  }
+  select{
+    padding:10px; border-radius:10px; border:2px solid #3a3382; background:#0e0b26; color:var(--text);
+    font-family:'Quicksand',sans-serif; font-weight:700;
+  }
+  .btn{
+    background:var(--cyan); color:#0e0b26; border:none; padding:11px 20px; border-radius:12px;
+    font-weight:800; font-family:'Baloo 2',sans-serif; cursor:pointer; font-size:0.95rem;
+    transition:transform 0.15s, box-shadow 0.2s;
+  }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(77,238,234,0.35); }
+  .btn.pink{ background:var(--pink); color:#fff; }
+  .btn.pink:hover{ box-shadow:0 6px 16px rgba(249,42,173,0.35); }
+  .btn.yellow{ background:var(--yellow); color:#3a2a00; }
+  .btn.yellow:hover{ box-shadow:0 6px 16px rgba(255,224,102,0.35); }
+  .btn.green{ background:var(--green); color:#0e2c00; }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  /* NUMBER LINE */
+  .numline-wrap{ background:#0e0b26; border-radius:16px; padding:16px 8px; text-align:center; }
+  canvas{ max-width:100%; }
+  .readout{ font-family:'Baloo 2',sans-serif; font-size:1.4rem; margin-top:8px; color:var(--yellow); min-height:1.6rem; }
+
+  /* FLIP CARDS */
+  .flip-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:18px 0; }
+  .flip-card{ perspective:1000px; height:120px; cursor:pointer; }
+  .flip-card-inner{
+    position:relative; width:100%; height:100%; transition:transform 0.5s; transform-style:preserve-3d;
+  }
+  .flip-card.flipped .flip-card-inner{ transform:rotateY(180deg); }
+  .flip-face{
+    position:absolute; width:100%; height:100%; backface-visibility:hidden;
+    border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-family:'Baloo 2',sans-serif; font-weight:700; gap:6px; text-align:center; padding:8px;
+  }
+  .flip-front{ background:var(--panel2); border:2px dashed #4a4296; font-size:1.4rem; }
+  .flip-back{ transform:rotateY(180deg); font-size:1.1rem; }
+  .flip-back.plus{ background:linear-gradient(135deg,var(--green),#3ab60a); color:#0e2c00; }
+  .flip-back.minus{ background:linear-gradient(135deg,var(--red),#a3123a); color:#fff; }
+  .flip-hint{ font-size:0.7rem; color:var(--muted); margin-top:4px; }
+
+  /* DOT GRID (multiplication/division) */
+  .dot-stage{
+    background:#0e0b26; border-radius:16px; padding:20px; min-height:160px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .group-box{
+    display:inline-flex; flex-wrap:wrap; gap:6px; padding:10px; margin:6px;
+    border:2px solid #3a3382; border-radius:12px; background:var(--panel2);
+    max-width:140px;
+  }
+  .dot{
+    width:16px; height:16px; border-radius:50%; opacity:0; transform:scale(0);
+    animation: popIn 0.35s forwards;
+  }
+  .dot.pos{ background:var(--cyan); }
+  .dot.neg{ background:var(--red); }
+  @keyframes popIn{ to{ opacity:1; transform:scale(1);} }
+
+  /* PRACTICE MINI QUIZ */
+  .mini-quiz{
+    background:#0e0b26; border-radius:16px; padding:20px; margin-top:18px; text-align:center;
+  }
+  .mini-question{ font-family:'Baloo 2',sans-serif; font-size:1.6rem; margin-bottom:14px; color:var(--text); }
+  .mini-feedback{ font-family:'Baloo 2',sans-serif; font-size:1rem; min-height:1.4rem; margin-top:10px; }
+  .mini-feedback.correct{ color:var(--green); }
+  .mini-feedback.wrong{ color:var(--red); }
+  .streak{ color:var(--yellow); font-weight:700; font-size:0.85rem; margin-top:6px; }
+
+  /* GAME ARENA */
+  .arena{
+    background:linear-gradient(160deg,#1c1750,#2b1560);
+    border-radius:18px; padding:24px; text-align:center;
+  }
+  .arena-stats{ display:flex; justify-content:center; gap:22px; flex-wrap:wrap; margin-bottom:16px; }
+  .stat{ text-align:center; }
+  .stat .val{ font-family:'Baloo 2',sans-serif; font-size:1.5rem; color:var(--yellow); }
+  .stat .lab{ font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .timer-track{ height:10px; background:#0e0b26; border-radius:6px; overflow:hidden; margin:14px 0; }
+  .timer-fill{ height:100%; background:linear-gradient(90deg,var(--green),var(--yellow),var(--red)); width:100%; transition:width 0.1s linear; }
+  .arena-question{ font-family:'Baloo 2',sans-serif; font-size:2rem; margin:18px 0; color:var(--text); }
+  .arena-options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:420px; margin:0 auto; }
+  .arena-opt{
+    background:var(--panel2); border:2px solid #3a3382; border-radius:12px; padding:14px;
+    font-family:'Baloo 2',sans-serif; font-size:1.2rem; cursor:pointer; color:var(--text);
+    transition:all 0.15s;
+  }
+  .arena-opt:hover{ border-color:var(--cyan); }
+  .arena-opt.correct{ background:var(--green); color:#0e2c00; border-color:var(--green); }
+  .arena-opt.wrong{ background:var(--red); color:#fff; border-color:var(--red); }
+  #arenaStart, #arenaEnd{ padding:20px; }
+  #arenaEnd h3{ font-size:1.8rem; color:var(--yellow); margin-bottom:8px; }
+
+  footer{ text-align:center; color:var(--muted); font-size:0.85rem; margin-top:20px; padding:0 16px; }
+
+  @media(max-width:600px){
+    .hero h1{ font-size:1.7rem; }
+    section{ padding:22px 18px; }
+    .arena-question{ font-size:1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="glow g1"></div><div class="glow g2"></div>
+  <span style="display:inline-block;background:rgba(255,255,255,0.08);padding:6px 16px;border-radius:999px;font-size:0.8rem;margin-bottom:14px;color:var(--cyan);letter-spacing:0.5px;">🕹️ MATEMATIKA · SMP KELAS 7</span>
+  <h1>Arena Operasi Bilangan Bulat</h1>
+  <p>Kuasai penjumlahan, pengurangan, perkalian, dan pembagian bilangan bulat lewat animasi, kartu tanda interaktif, dan game latihan seru!</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar" id="progressBar"></div>
+  <nav id="navbar">
+    <a href="#tambah" class="nav-link">➕ Penjumlahan</a>
+    <a href="#kurang" class="nav-link">➖ Pengurangan</a>
+    <a href="#kali" class="nav-link">✖️ Perkalian</a>
+    <a href="#bagi" class="nav-link">➗ Pembagian</a>
+    <a href="#arena" class="nav-link">🎮 Arena Latihan</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+  <!-- PENJUMLAHAN -->
+  <section id="tambah">
+    <h2><span class="icon add">➕</span> Penjumlahan Bilangan Bulat</h2>
+    <p class="subtitle">Bilangan positif melompat ke kanan, bilangan negatif melompat ke kiri</p>
+
+    <div class="rule-box">
+      Sama tanda → hasil dijumlahkan dengan tanda yang sama. Beda tanda → kurangkan nilai mutlaknya, tanda hasil mengikuti bilangan yang nilai mutlaknya lebih besar.
+    </div>
+
+    <div class="numline-wrap">
+      <canvas id="addCanvas" width="820" height="140"></canvas>
+      <div class="readout" id="addReadout">Atur bilangan lalu tekan Jalankan!</div>
+    </div>
+    <div class="input-row">
+      <input type="number" id="addA" value="-3">
+      <span style="font-family:'Baloo 2';font-size:1.3rem;">+</span>
+      <input type="number" id="addB" value="6">
+      <button class="btn" onclick="runAddition()">🚀 Jalankan</button>
+    </div>
+
+    <div class="mini-quiz">
+      <div class="mini-question" id="addQ">-</div>
+      <div class="input-row">
+        <input type="number" id="addAnswer" placeholder="?">
+        <button class="btn green" onclick="checkAnswer('add')">Cek Jawaban</button>
+        <button class="btn pink" onclick="newQuestion('add')">Soal Baru</button>
+      </div>
+      <div class="mini-feedback" id="addFeedback"></div>
+      <div class="streak" id="addStreak">Streak benar: 0</div>
+    </div>
+  </section>
+
+  <!-- PENGURANGAN -->
+  <section id="kurang">
+    <h2><span class="icon sub">➖</span> Pengurangan Bilangan Bulat</h2>
+    <p class="subtitle">Mengurangi sama dengan menjumlahkan lawan bilangannya</p>
+
+    <div class="rule-box">
+      a − b = a + (−b). Jadi, kurangi dengan cara <strong>membalik tanda bilangan kedua</strong>, lalu jumlahkan seperti biasa!
+    </div>
+
+    <div class="numline-wrap">
+      <canvas id="subCanvas" width="820" height="140"></canvas>
+      <div class="readout" id="subReadout">Atur bilangan lalu tekan Jalankan!</div>
+    </div>
+    <div class="input-row">
+      <input type="number" id="subA" value="4">
+      <span style="font-family:'Baloo 2';font-size:1.3rem;">−</span>
+      <input type="number" id="subB" value="-5">
+      <button class="btn" onclick="runSubtraction()">🚀 Jalankan</button>
+    </div>
+
+    <div class="mini-quiz">
+      <div class="mini-question" id="subQ">-</div>
+      <div class="input-row">
+        <input type="number" id="subAnswer" placeholder="?">
+        <button class="btn green" onclick="checkAnswer('sub')">Cek Jawaban</button>
+        <button class="btn pink" onclick="newQuestion('sub')">Soal Baru</button>
+      </div>
+      <div class="mini-feedback" id="subFeedback"></div>
+      <div class="streak" id="subStreak">Streak benar: 0</div>
+    </div>
+  </section>
+
+  <!-- PERKALIAN -->
+  <section id="kali">
+    <h2><span class="icon mul">✖️</span> Perkalian Bilangan Bulat</h2>
+    <p class="subtitle">Klik kartu untuk mengungkap tanda hasil perkalian</p>
+
+    <div class="flip-grid">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-face flip-front">(+) × (+)</div>
+          <div class="flip-face flip-back plus">= POSITIF<div class="flip-hint">Contoh: 4 × 3 = 12</div></div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-face flip-front">(−) × (−)</div>
+          <div class="flip-face flip-back plus">= POSITIF<div class="flip-hint">Contoh: -4 × -3 = 12</div></div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-face flip-front">(+) × (−)</div>
+          <div class="flip-face flip-back minus">= NEGATIF<div class="flip-hint">Contoh: 4 × -3 = -12</div></div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-face flip-front">(−) × (+)</div>
+          <div class="flip-face flip-back minus">= NEGATIF<div class="flip-hint">Contoh: -4 × 3 = -12</div></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="color:var(--cyan); font-size:1.05rem; margin:20px 0 8px;">Visualisasi Kelompok</h3>
+    <div class="dot-stage" id="mulStage"></div>
+    <div class="input-row">
+      <input type="number" id="mulA" value="3" min="-6" max="6">
+      <span style="font-family:'Baloo 2';font-size:1.3rem;">×</span>
+      <input type="number" id="mulB" value="-4" min="-6" max="6">
+      <button class="btn" onclick="runMultiplication()">🎬 Tampilkan</button>
+    </div>
+    <div class="readout" id="mulReadout" style="text-align:center;"></div>
+
+    <div class="mini-quiz">
+      <div class="mini-question" id="mulQ">-</div>
+      <div class="input-row">
+        <input type="number" id="mulAnswer" placeholder="?">
+        <button class="btn green" onclick="checkAnswer('mul')">Cek Jawaban</button>
+        <button class="btn pink" onclick="newQuestion('mul')">Soal Baru</button>
+      </div>
+      <div class="mini-feedback" id="mulFeedback"></div>
+      <div class="streak" id="mulStreak">Streak benar: 0</div>
+    </div>
+  </section>
+
+  <!-- PEMBAGIAN -->
+  <section id="bagi">
+    <h2><span class="icon div">➗</span> Pembagian Bilangan Bulat</h2>
+    <p class="subtitle">Aturan tanda sama seperti perkalian — lihat bagaimana kelompok terbagi rata</p>
+
+    <div class="rule-box">
+      Tanda sama (+÷+ atau −÷−) → hasil <strong>positif</strong>. Tanda berbeda (+÷− atau −÷+) → hasil <strong>negatif</strong>.
+    </div>
+
+    <div class="dot-stage" id="divStage"></div>
+    <div class="input-row">
+      <input type="number" id="divA" value="-12" min="-24" max="24">
+      <span style="font-family:'Baloo 2';font-size:1.3rem;">÷</span>
+      <input type="number" id="divB" value="3" min="-6" max="6">
+      <button class="btn" onclick="runDivision()">🎬 Bagikan</button>
+    </div>
+    <div class="readout" id="divReadout" style="text-align:center;"></div>
+
+    <div class="mini-quiz">
+      <div class="mini-question" id="divQ">-</div>
+      <div class="input-row">
+        <input type="number" id="divAnswer" placeholder="?">
+        <button class="btn green" onclick="checkAnswer('div')">Cek Jawaban</button>
+        <button class="btn pink" onclick="newQuestion('div')">Soal Baru</button>
+      </div>
+      <div class="mini-feedback" id="divFeedback"></div>
+      <div class="streak" id="divStreak">Streak benar: 0</div>
+    </div>
+  </section>
+
+  <!-- ARENA LATIHAN -->
+  <section id="arena">
+    <h2><span class="icon game">🎮</span> Arena Latihan Campuran</h2>
+    <p class="subtitle">Jawab secepat mungkin sebelum waktu habis — kumpulkan skor tertinggimu!</p>
+
+    <div class="arena">
+      <div id="arenaStart">
+        <p style="margin-bottom:16px; color:var(--muted);">10 soal acak: penjumlahan, pengurangan, perkalian, dan pembagian bilangan bulat.</p>
+        <button class="btn pink" onclick="startArena()">▶ Mulai Permainan</button>
+      </div>
+
+      <div id="arenaPlay" style="display:none;">
+        <div class="arena-stats">
+          <div class="stat"><div class="val" id="arenaScore">0</div><div class="lab">Skor</div></div>
+          <div class="stat"><div class="val" id="arenaStreak">0</div><div class="lab">Streak</div></div>
+          <div class="stat"><div class="val" id="arenaProgress">1/10</div><div class="lab">Soal</div></div>
+        </div>
+        <div class="timer-track"><div class="timer-fill" id="arenaTimer"></div></div>
+        <div class="arena-question" id="arenaQuestion">-</div>
+        <div class="arena-options" id="arenaOptions"></div>
+      </div>
+
+      <div id="arenaEnd" style="display:none;">
+        <h3 id="arenaFinalScore">Skor: 0/10</h3>
+        <p id="arenaMsg" style="color:var(--muted); margin-bottom:16px;"></p>
+        <button class="btn pink" onclick="startArena()">🔁 Main Lagi</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Materi ajar oleh Martin Bernard, M.Pd. — IKIP Siliwangi<br>
+  Arena Operasi Bilangan Bulat · Matematika SMP Kelas 7
+</footer>
+
+<script>
+/* ===== SCROLL SPY + PROGRESS ===== */
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  const st = window.scrollY;
+  const dh = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progressBar').style.width = (st/dh*100) + '%';
+  let current = '';
+  sections.forEach(s => { if(st >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+current));
+});
+
+/* ===== NUMBER LINE DRAWING ===== */
+const RANGE = 10;
+function drawNumline(canvas, value, path){
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height, y = h/2 + 6, margin = 36;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle = '#3a3382'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(margin,y); ctx.lineTo(w-margin,y); ctx.stroke();
+
+  const xFor = v => margin + ((v+RANGE)/(RANGE*2)) * (w-margin*2);
+
+  for(let i=-RANGE;i<=RANGE;i++){
+    const x = xFor(i);
+    ctx.strokeStyle = i===0 ? '#4deeea' : '#3a3382';
+    ctx.lineWidth = i===0 ? 3 : 1.5;
+    ctx.beginPath(); ctx.moveTo(x,y-9); ctx.lineTo(x,y+9); ctx.stroke();
+    if(i % 2 === 0){
+      ctx.fillStyle = i<0 ? '#ff5470' : (i>0 ? '#74ee15' : '#4deeea');
+      ctx.font = '600 12px Quicksand, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(i, x, y+26);
+    }
+  }
+
+  if(path){
+    ctx.strokeStyle = 'rgba(255,224,102,0.6)'; ctx.lineWidth = 3; ctx.setLineDash([6,5]);
+    ctx.beginPath(); ctx.moveTo(xFor(path.from), y-24); ctx.lineTo(xFor(path.to), y-24); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  const mx = xFor(value);
+  ctx.beginPath(); ctx.arc(mx,y,13,0,Math.PI*2);
+  ctx.fillStyle = value<0 ? '#ff5470' : (value>0 ? '#74ee15' : '#4deeea');
+  ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.font = '700 13px Baloo 2, sans-serif'; ctx.fillStyle = '#0e0b26'; ctx.textAlign='center';
+  ctx.fillText(value>0?'+':'', mx, y+4);
+}
+
+function animateJump(canvas, readoutEl, from, to, labelFn, done){
+  const duration = 900;
+  const start = performance.now();
+  function frame(now){
+    const p = Math.min(1,(now-start)/duration);
+    const ease = 1 - Math.pow(1-p,3);
+    const val = from + (to-from)*ease;
+    drawNumline(canvas, val, {from, to});
+    readoutEl.textContent = labelFn(Math.round(val*10)/10, p>=1);
+    if(p<1) requestAnimationFrame(frame); else { drawNumline(canvas, to, {from,to}); if(done) done(); }
+  }
+  requestAnimationFrame(frame);
+}
+
+const addCanvas = document.getElementById('addCanvas');
+drawNumline(addCanvas, 0);
+function runAddition(){
+  const a = clampInt(document.getElementById('addA').value);
+  const b = clampInt(document.getElementById('addB').value);
+  const readout = document.getElementById('addReadout');
+  animateJump(addCanvas, readout, a, a+b, (v,done)=> done ? `${a} + ${b} = ${a+b}` : `Bergerak dari ${a}... (${b>=0?'ke kanan':'ke kiri'})`);
+}
+
+const subCanvas = document.getElementById('subCanvas');
+drawNumline(subCanvas, 0);
+function runSubtraction(){
+  const a = clampInt(document.getElementById('subA').value);
+  const b = clampInt(document.getElementById('subB').value);
+  const readout = document.getElementById('subReadout');
+  readout.textContent = `${a} − (${b}) = ${a} + (${-b}) ... membalik tanda!`;
+  setTimeout(()=>{
+    animateJump(subCanvas, readout, a, a-b, (v,done)=> done ? `${a} − (${b}) = ${a-b}` : `Bergerak dari ${a}...`);
+  }, 700);
+}
+
+function clampInt(v){
+  v = parseInt(v); if(isNaN(v)) v=0;
+  return Math.max(-RANGE, Math.min(RANGE, v));
+}
+
+/* ===== MULTIPLICATION / DIVISION VISUALS ===== */
+function buildDotGrid(container, rows, cols, positive){
+  container.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.style.display = 'flex'; wrap.style.flexWrap = 'wrap'; wrap.style.justifyContent='center'; wrap.style.gap='8px';
+  let idx = 0;
+  for(let r=0;r<rows;r++){
+    const box = document.createElement('div');
+    box.className = 'group-box';
+    for(let c=0;c<cols;c++){
+      const dot = document.createElement('div');
+      dot.className = 'dot ' + (positive ? 'pos':'neg');
+      dot.style.animationDelay = (idx*0.03)+'s';
+      box.appendChild(dot);
+      idx++;
+    }
+    wrap.appendChild(box);
+  }
+  container.appendChild(wrap);
+}
+
+function runMultiplication(){
+  const a = parseInt(document.getElementById('mulA').value)||0;
+  const b = parseInt(document.getElementById('mulB').value)||0;
+  const result = a*b;
+  const rows = Math.min(6, Math.abs(a)||1);
+  const cols = Math.min(6, Math.abs(b)||1);
+  buildDotGrid(document.getElementById('mulStage'), rows, cols, result>=0);
+  document.getElementById('mulReadout').innerHTML =
+    `${a} × ${b} = <strong style="color:${result>=0?'#74ee15':'#ff5470'}">${result}</strong> — ${rows} kelompok berisi ${cols} titik (${result>=0?'positif':'negatif'})`;
+}
+runMultiplication();
+
+function runDivision(){
+  const a = parseInt(document.getElementById('divA').value)||0;
+  const b = parseInt(document.getElementById('divB').value)||1;
+  if(b===0){ document.getElementById('divReadout').textContent = 'Tidak bisa dibagi 0!'; return; }
+  const result = a/b;
+  const groups = Math.min(6, Math.max(1, Math.abs(b)));
+  const perGroup = Math.min(8, Math.round(Math.abs(a)/groups) || 1);
+  buildDotGrid(document.getElementById('divStage'), groups, perGroup, result>=0);
+  const resultText = Number.isInteger(result) ? result : result.toFixed(2);
+  document.getElementById('divReadout').innerHTML =
+    `${a} ÷ ${b} = <strong style="color:${result>=0?'#74ee15':'#ff5470'}">${resultText}</strong> — dibagi rata ke ${groups} kelompok`;
+}
+runDivision();
+
+/* ===== MINI QUIZ PER SECTION ===== */
+const state = {
+  add:{a:0,b:0,ans:0,streak:0}, sub:{a:0,b:0,ans:0,streak:0},
+  mul:{a:0,b:0,ans:0,streak:0}, div:{a:0,b:0,ans:0,streak:0}
+};
+function rnd(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+function newQuestion(type){
+  const el = document.getElementById(type+'Q');
+  const fb = document.getElementById(type+'Feedback');
+  fb.textContent=''; fb.className='mini-feedback';
+  document.getElementById(type+'Answer').value='';
+  let a,b,ans,text;
+  if(type==='add'){ a=rnd(-10,10); b=rnd(-10,10); ans=a+b; text=`${a} + (${b}) = ?`; }
+  if(type==='sub'){ a=rnd(-10,10); b=rnd(-10,10); ans=a-b; text=`${a} − (${b}) = ?`; }
+  if(type==='mul'){ a=rnd(-9,9); b=rnd(-9,9); ans=a*b; text=`${a} × (${b}) = ?`; }
+  if(type==='div'){ b=rnd(1,9)*(Math.random()<0.5?1:-1); const q=rnd(-9,9); a=q*b; ans=q; text=`${a} ÷ (${b}) = ?`; }
+  state[type] = {...state[type], a,b,ans};
+  el.textContent = text;
+}
+['add','sub','mul','div'].forEach(newQuestion);
+
+function checkAnswer(type){
+  const val = parseInt(document.getElementById(type+'Answer').value);
+  const fb = document.getElementById(type+'Feedback');
+  const streakEl = document.getElementById(type+'Streak');
+  if(isNaN(val)){ fb.textContent='Isi jawabanmu dulu ya!'; fb.className='mini-feedback wrong'; return; }
+  if(val === state[type].ans){
+    state[type].streak++;
+    fb.textContent = '✅ Benar! Mantap!';
+    fb.className = 'mini-feedback correct';
+    setTimeout(()=>newQuestion(type), 900);
+  } else {
+    state[type].streak = 0;
+    fb.textContent = `❌ Belum tepat. Jawaban yang benar: ${state[type].ans}`;
+    fb.className = 'mini-feedback wrong';
+  }
+  streakEl.textContent = `Streak benar: ${state[type].streak}`;
+}
+
+/* ===== ARENA GAME ===== */
+let arena = { score:0, streak:0, idx:0, total:10, timerId:null, timeLeft:100, current:null };
+
+function genArenaQuestion(){
+  const ops = ['add','sub','mul','div'];
+  const op = ops[rnd(0,3)];
+  let a,b,ans,text;
+  if(op==='add'){ a=rnd(-12,12); b=rnd(-12,12); ans=a+b; text=`${a} + (${b})`; }
+  if(op==='sub'){ a=rnd(-12,12); b=rnd(-12,12); ans=a-b; text=`${a} − (${b})`; }
+  if(op==='mul'){ a=rnd(-9,9); b=rnd(-9,9); ans=a*b; text=`${a} × (${b})`; }
+  if(op==='div'){ b=rnd(1,9)*(Math.random()<0.5?1:-1); const q=rnd(-9,9); a=q*b; ans=q; text=`${a} ÷ (${b})`; }
+
+  const options = new Set([ans]);
+  while(options.size<4){
+    const delta = rnd(-6,6);
+    if(delta!==0) options.add(ans+delta);
+  }
+  const optArr = shuffle([...options]);
+  return {text, ans, options:optArr};
+}
+function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+function startArena(){
+  arena = { score:0, streak:0, idx:0, total:10, timerId:null, timeLeft:100, current:null };
+  document.getElementById('arenaStart').style.display='none';
+  document.getElementById('arenaEnd').style.display='none';
+  document.getElementById('arenaPlay').style.display='block';
+  nextArenaQuestion();
+}
+
+function nextArenaQuestion(){
+  clearInterval(arena.timerId);
+  if(arena.idx >= arena.total){ endArena(); return; }
+  arena.idx++;
+  arena.current = genArenaQuestion();
+  arena.timeLeft = 100;
+  document.getElementById('arenaScore').textContent = arena.score;
+  document.getElementById('arenaStreak').textContent = arena.streak;
+  document.getElementById('arenaProgress').textContent = `${arena.idx}/${arena.total}`;
+  document.getElementById('arenaQuestion').textContent = arena.current.text + ' = ?';
+  const optsEl = document.getElementById('arenaOptions');
+  optsEl.innerHTML = '';
+  arena.current.options.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.className = 'arena-opt';
+    btn.textContent = opt;
+    btn.onclick = () => arenaAnswer(opt, btn);
+    optsEl.appendChild(btn);
+  });
+  const timerFill = document.getElementById('arenaTimer');
+  timerFill.style.width = '100%';
+  arena.timerId = setInterval(()=>{
+    arena.timeLeft -= 2;
+    timerFill.style.width = Math.max(0,arena.timeLeft) + '%';
+    if(arena.timeLeft <= 0){
+      clearInterval(arena.timerId);
+      arenaAnswer(null, null);
+    }
+  }, 100);
+}
+
+function arenaAnswer(val, btnEl){
+  clearInterval(arena.timerId);
+  const correct = arena.current.ans;
+  document.querySelectorAll('.arena-opt').forEach(o => {
+    o.style.pointerEvents='none';
+    if(parseInt(o.textContent) === correct) o.classList.add('correct');
+    else if(o === btnEl) o.classList.add('wrong');
+  });
+  if(val === correct){
+    arena.score += 10 + Math.max(0, Math.floor(arena.timeLeft/10));
+    arena.streak++;
+  } else {
+    arena.streak = 0;
+  }
+  setTimeout(nextArenaQuestion, 1000);
+}
+
+function endArena(){
+  document.getElementById('arenaPlay').style.display='none';
+  document.getElementById('arenaEnd').style.display='block';
+  document.getElementById('arenaFinalScore').textContent = `Skor Akhir: ${arena.score}`;
+  const msg = arena.score >= 90 ? 'Luar biasa! Kamu master bilangan bulat! 🏆' :
+              arena.score >= 50 ? 'Bagus! Terus berlatih untuk skor lebih tinggi! 💪' :
+              'Yuk coba lagi, kamu pasti bisa lebih baik! 📘';
+  document.getElementById('arenaMsg').textContent = msg;
+}
+</script>
+</body>
+</html>
